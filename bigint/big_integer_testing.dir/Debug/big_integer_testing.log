@@ -1,0 +1,6 @@
+﻿  big_integer.cpp
+C:\Workspace\GitHub\cpp\bigint\big_integer.cpp(682): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+LINK : warning LNK4044: unrecognized option '/lgmp'; ignored
+LINK : warning LNK4044: unrecognized option '/lgmpxx'; ignored
+LINK : warning LNK4044: unrecognized option '/lpthread'; ignored
+  big_integer_testing.vcxproj -> C:\Workspace\GitHub\cpp\bigint\Debug\big_integer_testing.exe
