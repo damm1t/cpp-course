@@ -1,0 +1,5 @@
+.Debug/
+.CMakeFiles/
+.vs/
+.Win32/
+*.vcxproj
