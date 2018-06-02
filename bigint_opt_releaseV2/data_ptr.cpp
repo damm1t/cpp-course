@@ -56,7 +56,7 @@ uint32_t& opt_vector::back()
 	return this->data_ptr->back();
 }
 
-uint32_t opt_vector::back() const
+uint32_t const& opt_vector::back() const
 {
 	return this->small_flag ? this->small_value : this->data_ptr->back();
 }
