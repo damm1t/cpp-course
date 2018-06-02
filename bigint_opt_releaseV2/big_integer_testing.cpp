@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "big_integer.h"
-/*
+
 TEST(correctness, two_plus_two)
 {
     EXPECT_EQ(big_integer(2) + big_integer(2), big_integer(4));
@@ -20,7 +20,7 @@ TEST(correctness, default_ctor)
     big_integer b = 0;
     EXPECT_EQ(a, 0);
     EXPECT_EQ(a, b);
-}*/
+}
 
 TEST(correctness, ctor_limits)
 {
