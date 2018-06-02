@@ -18,10 +18,6 @@ struct opt_vector {
 
 	uint32_t const& back() const;
 
-	/*void resize(size_t i);
-
-	void resize(size_t i, uint32_t val);*/
-
 	size_t size() const;
 
 	/*auto begin() const
@@ -66,7 +62,6 @@ struct opt_vector {
 
 	void push_back(uint32_t val);
 
-	//void swap(opt_vector &b) noexcept;
 
 private:
 	union {
@@ -76,7 +71,8 @@ private:
 	bool small_flag; //small_value or not
 	bool empty_flag;
 	void make_own();
-
+	void to_big();
+	void to_small();
 };
 
 #endif //DATA_H

@@ -127,7 +127,7 @@ void opt_vector::to_small()
 	if (small_flag)
 		return;
 	data_ptr.~shared_ptr();
-	small_flag = 0;
+	small_flag = false;
 	small_flag = true;
 }
 

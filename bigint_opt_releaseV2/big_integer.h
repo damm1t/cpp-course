@@ -93,10 +93,10 @@ private:
 	void to_simple_code();
 
 	uint32_t& operator[](size_t);
-	uint32_t const& operator[](size_t) const;
+	const uint32_t& operator[](size_t) const;
 	size_t size() const;
-	uint32_t back();
-	uint32_t back() const;
+	uint32_t& back();
+	const uint32_t& back() const;
 	void pop_back();
 	void push_back(uint32_t);
 	//bool empty() const;
