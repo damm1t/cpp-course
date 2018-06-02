@@ -3,3 +3,8 @@
 .vs/
 .Win32/
 *.vcxproj
+*.obj
+*.filters
+*.tlog
+*.user
+*.log
