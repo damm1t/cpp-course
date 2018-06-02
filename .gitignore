@@ -8,3 +8,4 @@
 *.tlog
 *.user
 *.log
+.CMakeCache.txt
