@@ -30,9 +30,16 @@
 #include <stdio.h>
 
 #include <gtest/gtest.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 
 GTEST_API_ int main(int argc, char **argv) {
   printf("Running main() from gtest_main.cc\n");
   testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  //_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+  RUN_ALL_TESTS();
+  system("pause");
+  return 0;
 }

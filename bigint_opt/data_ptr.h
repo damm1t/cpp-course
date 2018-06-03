@@ -11,20 +11,12 @@ using shared_data = std::shared_ptr<std::vector<uint32_t>>;
 struct opt_vector {
 	opt_vector();
 	opt_vector(uint32_t a);
-	~opt_vector()
-	{
-		//TODO 
-	}
-	
+	~opt_vector();
 	opt_vector(opt_vector const &other);
 
-	uint32_t &back();
+	uint32_t& back();
 
-	uint32_t back() const;
-
-	/*void resize(size_t i);
-
-	void resize(size_t i, uint32_t val);*/
+	uint32_t const& back() const;
 
 	size_t size() const;
 
@@ -60,9 +52,9 @@ struct opt_vector {
 		return this->begin();
 	}
 	*/
-	uint32_t &operator[](size_t i);
+	uint32_t& operator[](size_t i);
 
-	uint32_t operator[](size_t i) const;
+	uint32_t const& operator[](size_t i) const;
 
 	opt_vector &operator=(opt_vector const &other);
 
@@ -70,17 +62,17 @@ struct opt_vector {
 
 	void push_back(uint32_t val);
 
-	//void swap(opt_vector &b) noexcept;
 
 private:
 	union {
 		uint32_t small_value;
 		shared_data data_ptr;
 	};
-	bool small_flag; //helps to see whether we have small_value or not
-
+	bool small_flag; //small_value or not
+	bool empty_flag;
 	void make_own();
-
+	void to_big();
+	void to_small();
 };
 
 #endif //DATA_H

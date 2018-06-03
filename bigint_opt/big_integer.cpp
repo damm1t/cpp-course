@@ -145,8 +145,10 @@ void big_integer::subtract(big_integer const& b)
 		}
 	}
 	const auto pos = b.size();
+	
 	while (tmp != 0)
 	{
+		data_.push_back(0);
 		tmp += data_[pos];
 		if (tmp < 0)
 		{
@@ -186,7 +188,8 @@ void big_integer::invert()
 
 void big_integer::to_add_code()
 {
-	push_back(0), push_back(0);
+	push_back(0);
+	push_back(0);
 	if (signum_ < 0)
 	{
 		invert();
@@ -198,7 +201,11 @@ void big_integer::to_add_code()
 void big_integer::to_simple_code()
 {
 	if (back() != 0)
-		signum_ = -1, invert(), add(1);
+	{
+		signum_ = -1;
+		invert();
+		add(1);
+	}
 	correct_size();
 }
 
@@ -207,7 +214,7 @@ uint32_t& big_integer::operator[](const size_t i)
 	return data_[i];
 }
 
-const uint32_t& big_integer::operator[](const size_t i) const
+uint32_t const& big_integer::operator[](const size_t i) const
 {
 	return data_[i];
 }
@@ -217,12 +224,12 @@ size_t big_integer::size() const
 	return data_.size();
 }
 
-uint32_t& big_integer::back()
+uint32_t big_integer::back()
 {
 	return data_.back();
 }
 
-const uint32_t& big_integer::back() const
+uint32_t big_integer::back() const
 {
 	return data_.back();
 }
@@ -237,12 +244,6 @@ void big_integer::push_back(const uint32_t x)
 	data_.push_back(x);
 }
 
-/*bool big_integer::empty() const
-{
-	return data_.empty();
-}*/
-
-
 //constructors :
 
 big_integer::big_integer()
@@ -253,7 +254,12 @@ big_integer::big_integer()
 
 big_integer::big_integer(const int val)
 {
-	data_ = opt_vector(abs(int64_t(val)));
+	if(val < 0)
+		data_ = opt_vector(-static_cast<uint32_t>(val));
+	else
+	{
+		data_ = opt_vector(static_cast<uint32_t>(val));
+	}
 	signum_ = val ? (val < 0 ? -1 : 1) : 0;
 }
 
@@ -271,22 +277,21 @@ big_integer::big_integer(const uint64_t val)
 	signum_ = val != 0;
 }
 
-big_integer::big_integer(std::vector<uint32_t>& v, const short signum)
-	: data_(opt_vector())
-	, signum_(signum)
+big_integer::big_integer(std::vector<uint32_t>& v, const short signum): signum_(signum)
 {
-	if (v.empty())
+	if(v.size() == 0)
 	{
+		data_ = opt_vector();
 		return;
 	}
-	data_[0] = v[0];
+	data_ = opt_vector(v[0]);
 	for (size_t i = 1; i < v.size(); i++)
 		this->data_.push_back(v[i]);
 }
 
 big_integer::big_integer(std::string const& s)
 {
-	data_.push_back(0);
+	data_ = opt_vector(0);
 	signum_ = 0;
 	for (auto c : s)
 	{
@@ -333,7 +338,7 @@ bool big_integer::is_deg2() const
 	if (back() != 1) 
 		return false;
 	for (size_t i = 0; i < size() - 1; ++i)
-		if (data_[i]) 
+		if (data_[i] != 0) 
 			return false;
 	return true;
 }
@@ -361,8 +366,6 @@ int abs_cmp(big_integer const& a, big_integer const& b)
 	}
 	else
 	{
-		std::vector<int> v;
-		v.rend();
 		//const auto pair = std::mismatch(a.data_.rbegin(), a.data_.rend(), b.data_.rbegin());
 		for (int i = a.size() - 1; i >= 0; --i)
 			{
@@ -384,40 +387,6 @@ int cmp(big_integer const& a, big_integer const& b, const bool comp_abs)
 		return a.signum_ > b.signum_ ? 1 : -1;
 	return a.signum_ > 0 ? res_abs : -res_abs;
 }
-
-
-//int cmp(big_integer const& a, big_integer const& b, const bool comp_abs)
-//{
-//	if (!comp_abs && a.signum_ != b.signum_)
-//		return (a.signum_ > b.signum_ ? 1 : -1);
-//	if (a.size() != b.size())
-//	{
-//		if (a.size() > b.size() && a.signum_ == 1 && !comp_abs)
-//			return 1;
-//		if (a.size() < b.size() && a.signum_ == -1 && !comp_abs)
-//			return 1;
-//		if (comp_abs)
-//		{
-//			if (a.size() > b.size())
-//				return 1;
-//		}
-//		return -1;
-//	}
-//	//std::mismatch(a..rbegin())
-//	for (int i = a.size() - 1; i >= 0; --i)
-//	{
-//		if (a[i] == b[i])
-//			continue;
-//		if (!comp_abs && a[i] > b[i] && a.signum_ == 1)
-//			return 1;
-//		if (!comp_abs && a[i] < b[i] && a.signum_ == -1)
-//			return 1;
-//		if (comp_abs)
-//			return a[i] > b[i] ? 1 : -1;
-//		return -1;
-//	}
-//	return 0;
-//}
 
 bool operator==(big_integer const& a, big_integer const& b)
 {
@@ -696,7 +665,8 @@ big_integer operator&(big_integer const& a, big_integer const& b)
 
 big_integer operator<<(big_integer const& a, int rhs)
 {
-	if (rhs < 0) return a >> rhs;
+	if (rhs < 0) 
+		return a >> rhs;
 	const auto complete = rhs >> 5;
 	rhs &= 31;
 	auto ans = a;
@@ -715,7 +685,8 @@ big_integer operator<<(big_integer const& a, int rhs)
 
 big_integer operator>>(big_integer const& a, int rhs)
 {
-	if (rhs < 0) return a << rhs;
+	if (rhs < 0) 
+		return a << rhs;
 	const auto complete = rhs >> 5;
 	rhs &= 31;
 	auto ans = a;
@@ -723,12 +694,13 @@ big_integer operator>>(big_integer const& a, int rhs)
 	for (auto i = a.size() - 1; ; --i)
 	{
 		const auto digit = ans[i];
-		ans[i] = (tmp << LOG - rhs) + (ans[i] >> rhs);
+		ans[i] = (tmp << (LOG - rhs)) + (ans[i] >> rhs);
 		tmp = digit & (1ll << rhs) - 1;
 		if (!i) break;
 	}
 	ans.correct_size();
-	if (!a.is_deg2() && a.signum_ == -1) ans -= 1;
+	if (!a.is_deg2() && a.signum_ == -1) 
+		ans -= 1;
 	return ans * big_integer::base_deg(static_cast<size_t>(complete));
 }
 
@@ -753,13 +725,6 @@ big_integer big_integer::base_deg(const size_t n)
 	res_data.back() = 1;
 	return big_integer(res_data, 1);
 }
-
-
-// destructor:
-//big_integer::~big_integer()
-//{
-//	data_.clear();
-//}
 
 std::string to_string(big_integer const& b)
 {

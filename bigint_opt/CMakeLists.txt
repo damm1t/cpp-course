@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(BIGINT)
+project(BIGINT_OPT)
 
 include_directories(${BIGINT_SOURCE_DIR})
 
@@ -8,6 +8,9 @@ add_executable(big_integer_testing
                big_integer_testing.cpp
                big_integer.h
                big_integer.cpp
+               data_ptr.h
+               data_ptr.cpp
+               data_ptr_testing.cpp
                gtest/gtest-all.cc
                gtest/gtest.h
                gtest/gtest_main.cc)

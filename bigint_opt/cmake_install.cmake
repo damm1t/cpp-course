@@ -1,4 +1,4 @@
-# Install script for directory: C:/Workspace/GitHub/cpp/bigint
+# Install script for directory: C:/Workspace/GitHub/cpp/bigint_opt
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Workspace/GitHub/cpp/bigint/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Workspace/GitHub/cpp/bigint_opt/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

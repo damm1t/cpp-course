@@ -182,7 +182,7 @@ TEST(correctness, mul)
     a *= b;
     EXPECT_TRUE(a == 100);
 }
-
+/**/
 TEST(correctness, mul_signed)
 {
     big_integer a = -5;
@@ -680,3 +680,4 @@ TEST(correctness, mul_merge_randomized)
         EXPECT_TRUE(a == b);
     }
 }
+/**/
