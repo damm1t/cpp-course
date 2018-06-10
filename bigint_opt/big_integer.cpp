@@ -145,7 +145,7 @@ void big_integer::subtract(big_integer const& b)
 		}
 	}
 	const auto pos = b.size();
-	
+
 	while (tmp != 0)
 	{
 		data_.push_back(0);
@@ -254,7 +254,7 @@ big_integer::big_integer()
 
 big_integer::big_integer(const int val)
 {
-	if(val < 0)
+	if (val < 0)
 		data_ = opt_vector(-static_cast<uint32_t>(val));
 	else
 	{
@@ -279,7 +279,7 @@ big_integer::big_integer(const uint64_t val)
 
 big_integer::big_integer(std::vector<uint32_t>& v, const short signum): signum_(signum)
 {
-	if(v.size() == 0)
+	if (v.size() == 0)
 	{
 		data_ = opt_vector();
 		return;
@@ -335,10 +335,10 @@ std::string big_integer::to_string() const
 
 bool big_integer::is_deg2() const
 {
-	if (back() != 1) 
+	if (back() != 1)
 		return false;
 	for (size_t i = 0; i < size() - 1; ++i)
-		if (data_[i] != 0) 
+		if (data_[i] != 0)
 			return false;
 	return true;
 }
@@ -349,12 +349,11 @@ big_integer& big_integer::operator=(const big_integer& other)
 {
 	if (this == &other)
 		return *this;
-	
+
 	data_ = other.data_;
 	signum_ = other.signum_;
 	return *this;
 }
-
 
 // comporator
 
@@ -368,11 +367,11 @@ int abs_cmp(big_integer const& a, big_integer const& b)
 	{
 		//const auto pair = std::mismatch(a.data_.rbegin(), a.data_.rend(), b.data_.rbegin());
 		for (int i = a.size() - 1; i >= 0; --i)
-			{
-				if (a[i] == b[i])
-					continue;
-				return a[i] > b[i] ? 1 : -1;
-			}
+		{
+			if (a[i] == b[i])
+				continue;
+			return a[i] > b[i] ? 1 : -1;
+		}
 		return 0;
 	}
 }
@@ -433,7 +432,6 @@ std::ostream& operator<<(std::ostream& out, big_integer const& bint)
 	out << bint.to_string();
 	return out;
 }
-
 
 //arithmetic :
 
@@ -665,7 +663,7 @@ big_integer operator&(big_integer const& a, big_integer const& b)
 
 big_integer operator<<(big_integer const& a, int rhs)
 {
-	if (rhs < 0) 
+	if (rhs < 0)
 		return a >> rhs;
 	const auto complete = rhs >> 5;
 	rhs &= 31;
@@ -685,7 +683,7 @@ big_integer operator<<(big_integer const& a, int rhs)
 
 big_integer operator>>(big_integer const& a, int rhs)
 {
-	if (rhs < 0) 
+	if (rhs < 0)
 		return a << rhs;
 	const auto complete = rhs >> 5;
 	rhs &= 31;
@@ -699,7 +697,7 @@ big_integer operator>>(big_integer const& a, int rhs)
 		if (!i) break;
 	}
 	ans.correct_size();
-	if (!a.is_deg2() && a.signum_ == -1) 
+	if (!a.is_deg2() && a.signum_ == -1)
 		ans -= 1;
 	return ans * big_integer::base_deg(static_cast<size_t>(complete));
 }

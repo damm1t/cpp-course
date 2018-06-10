@@ -8,11 +8,12 @@
 
 using shared_data = std::shared_ptr<std::vector<uint32_t>>;
 
-struct opt_vector {
+struct opt_vector
+{
 	opt_vector();
 	opt_vector(uint32_t a);
 	~opt_vector();
-	opt_vector(opt_vector const &other);
+	opt_vector(opt_vector const& other);
 
 	uint32_t& back();
 
@@ -56,7 +57,7 @@ struct opt_vector {
 
 	uint32_t const& operator[](size_t i) const;
 
-	opt_vector &operator=(opt_vector const &other);
+	opt_vector& operator=(opt_vector const& other);
 
 	uint32_t pop_back();
 
@@ -64,10 +65,12 @@ struct opt_vector {
 
 
 private:
-	union {
+	union
+	{
 		uint32_t small_value;
 		shared_data data_ptr;
 	};
+
 	bool small_flag; //small_value or not
 	bool empty_flag;
 	void make_own();

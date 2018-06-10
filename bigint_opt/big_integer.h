@@ -25,14 +25,14 @@ struct big_integer
 
 	bool is_deg2() const;
 
-	big_integer& operator = (const big_integer&);
+	big_integer& operator =(const big_integer&);
 
-	friend bool operator == (big_integer const&, big_integer const&);
-	friend bool operator != (big_integer const&, big_integer const&);
-	friend bool operator < (big_integer const&, big_integer const&);
-	friend bool operator <= (big_integer const&, big_integer const&);
-	friend bool operator > (big_integer const&, big_integer const&);
-	friend bool operator >= (big_integer const&, big_integer const&);
+	friend bool operator ==(big_integer const&, big_integer const&);
+	friend bool operator !=(big_integer const&, big_integer const&);
+	friend bool operator <(big_integer const&, big_integer const&);
+	friend bool operator <=(big_integer const&, big_integer const&);
+	friend bool operator >(big_integer const&, big_integer const&);
+	friend bool operator >=(big_integer const&, big_integer const&);
 
 	friend std::ostream& operator<<(std::ostream&, big_integer const&);
 	friend std::istream& operator>>(std::istream&, big_integer const&);
@@ -57,7 +57,7 @@ struct big_integer
 	friend big_integer& operator&=(big_integer&, big_integer const&);
 	friend big_integer& operator<<=(big_integer&, int);
 	friend big_integer& operator>>=(big_integer&, int);
-	template<class FunctorT>
+	template <class FunctorT>
 	static big_integer any_binary(big_integer const&, big_integer const&, FunctorT);
 	friend big_integer operator^(big_integer const&, big_integer const&);
 	friend big_integer operator|(big_integer const&, big_integer const&);
@@ -99,13 +99,9 @@ private:
 	uint32_t back() const;
 	void pop_back();
 	void push_back(uint32_t);
-	//bool empty() const;
 	friend int cmp(big_integer const& a, big_integer const& b, const bool comp_abs = false);
 	friend int abs_cmp(big_integer const& a, big_integer const& b);
-
-
 };
-
 
 
 std::string to_string(big_integer const& b);
