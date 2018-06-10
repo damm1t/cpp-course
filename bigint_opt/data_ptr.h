@@ -21,38 +21,6 @@ struct opt_vector
 
 	size_t size() const;
 
-	/*auto begin() const
-	{
-		if(this->small_flag)
-		{
-			
-		}
-		else
-		{
-			return this->data_ptr->begin();
-		}
-	}
-
-	auto end() const
-	{
-		if (this->small_flag)
-		{
-			return &this->small_value;
-		}
-		else
-		{
-			return this->data_ptr->end();
-		}
-	}
-	auto rbegin() const
-	{
-		return this->end();
-	}
-	auto rend() const
-	{
-		return this->begin();
-	}
-	*/
 	uint32_t& operator[](size_t i);
 
 	uint32_t const& operator[](size_t i) const;

@@ -1,3 +1,0 @@
-C:/Workspace/GitHub/cpp/bigint_opt/CMakeFiles/big_integer_testing.dir
-C:/Workspace/GitHub/cpp/bigint_opt/CMakeFiles/ALL_BUILD.dir
-C:/Workspace/GitHub/cpp/bigint_opt/CMakeFiles/ZERO_CHECK.dir

@@ -693,7 +693,7 @@ big_integer operator>>(big_integer const& a, int rhs)
 	{
 		const auto digit = ans[i];
 		ans[i] = (tmp << (LOG - rhs)) + (ans[i] >> rhs);
-		tmp = digit & (1ll << rhs) - 1;
+		tmp = digit & ((1ll << rhs) - 1);
 		if (!i) break;
 	}
 	ans.correct_size();

@@ -38,7 +38,7 @@
 GTEST_API_ int main(int argc, char **argv) {
   printf("Running main() from gtest_main.cc\n");
   testing::InitGoogleTest(&argc, argv);
-  //_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+  _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
   RUN_ALL_TESTS();
   system("pause");
   return 0;

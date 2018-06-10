@@ -29,7 +29,10 @@ opt_vector::opt_vector(opt_vector const& other) : small_flag(other.small_flag), 
 	if (this->small_flag)
 		this->small_value = other.small_value;
 	else
+	{
+		new(&data_ptr) std::shared_ptr<std::vector<uint32_t>>();
 		this->data_ptr = other.data_ptr;
+	}
 }
 
 
