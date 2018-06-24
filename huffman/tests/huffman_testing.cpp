@@ -359,7 +359,7 @@ void check(const string& input_decode)
 
 TEST(encode_decode, file_input)
 {
-	generate(1024);
+	generate(256);
 
 	compress(filename_input, filename_output, filename_hf);
 	string input_decode = "new.in";
@@ -369,7 +369,7 @@ TEST(encode_decode, file_input)
 
 TEST(encode_decode, file_big_input)
 {
-	generate(1024 * 4);
+	generate(1024);
 
 	compress(filename_input, filename_output, filename_hf);
 	string input_decode = "new.in";

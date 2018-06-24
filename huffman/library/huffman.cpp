@@ -3,6 +3,8 @@
 #include <set>
 #include <algorithm>
 #include <nmmintrin.h>
+#include <cstring>
+#include <climits>
 
 namespace huffman
 {
@@ -20,7 +22,7 @@ namespace huffman
 		int res = 0;
 		for (int i = 0; i < 4; ++i)
 		{
-			res += (static_cast<int>(x[end++]) << i);
+			res += (static_cast<int>(x[end++]) << (8 * i));
 		}
 		return res;
 	}
@@ -197,7 +199,8 @@ namespace huffman
 			q.push(tree_);
 
 		for (int i = CHAR_BIT - 1; i >= 0; --i)
-			if ((move & (1 << i)) != 0)
+			if ((move & (1 << i)) != 0) {
+				assert(!q.empty());
 				if (!q.top()->left)
 				{
 					q.top()->left = std::make_shared<tree_node>(tree_node());
@@ -208,6 +211,7 @@ namespace huffman
 					q.top()->right = std::make_shared<tree_node>(tree_node());
 					q.push(q.top()->right);
 				}
+			}
 			else
 			{
 				if (q.empty())
