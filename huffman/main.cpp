@@ -56,7 +56,7 @@ void compress(string filename_in, string filename_out, string filename_hf)
 	}
 	fin.clear();
 	fin.seekg(0);
-	fout.write(reinterpret_cast<char*>(&main_size), sizeof size_t);
+	fout.write(reinterpret_cast<char*>(&main_size), sizeof (size_t));
 	for (;;)
 	{
 		fin.read(input_chunk, BUFFER);
@@ -114,7 +114,7 @@ void decompress(string filename_in, string filename_out, string filename_hf)
 		throw HuffException(HuffException::OUTFILE_NOT_OPEN, filename_out);
 	}
 	size_t main_size = 0;
-	fin.read(reinterpret_cast<char*>(&main_size), sizeof size_t);
+	fin.read(reinterpret_cast<char*>(&main_size), sizeof (size_t));
 	for (;;)
 	{
 		fin.read(input_chunk, BUFFER);

@@ -47,7 +47,7 @@ namespace huffman
 
 	void HuffmanEncoder::simplify(byte* output, vector<byte>& bite_array, int& end)
 	{
-		for (int i = 0; i < bite_array.size(); i += 8) // ToDo
+		for (int i = 0; i < bite_array.size(); i += 8)
 		{
 			byte val = 0;
 			for (int j = i; j < CHAR_BIT + i; ++j)
