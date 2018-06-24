@@ -85,8 +85,12 @@ namespace huffman
 
 	void HuffmanEncoder::dfs(const tree_ptr cur, vector<byte>& key)
 	{
-		if (cur->is_leaf())
-			codes[cur->symb] = key;
+		if (cur->is_leaf()) {
+			if (key.empty())
+				cur->left = std::make_shared<tree_node>(tree_node(cur->symb, cur->freq));
+			else
+				codes[cur->symb] = key;
+		}
 		if (cur->left)
 		{
 			key.push_back(0);
@@ -167,9 +171,9 @@ namespace huffman
 
 	void HuffmanEncoder::write_tree(byte*& output, size_t& size)
 	{
-		if (bin_tree.empty()) // if not created yet
+		if (bin_tree.empty() && tree) // if not created yet
 			create_bin_code(tree);
-		//int64_t: 64 / 8 = 8 byte
+		//int64_t: 64 / 8 = 8 bite
 		const int simp_tree = (bin_tree.size() + 7) / 8;
 		size = 4 + nodes.size() + 4 + simp_tree;
 		output = new byte[size];

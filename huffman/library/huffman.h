@@ -44,9 +44,6 @@ namespace huffman
 		tree_node(const byte symb, const size_t freq) : symb(symb), freq(freq)
 		{
 		};
-		/*bool operator<(tree_node const& node) const;
-		bool operator>(tree_node const& node) const;*/
-		//bool operator==(tree_node const &node) const;
 		friend shared_ptr<tree_node> node_merge(shared_ptr<tree_node>& node1,
 		                                        shared_ptr<tree_node>& node2);
 	};
