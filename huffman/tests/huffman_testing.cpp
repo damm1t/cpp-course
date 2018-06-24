@@ -63,7 +63,7 @@ void compress(string filename_in, string filename_out, string filename_hf)
 	std::ofstream fout(filename_out.c_str(), std::ios_base::binary);
 	fin.clear();
 	fin.seekg(0);
-	fout.write(reinterpret_cast<char*>(&main_size), sizeof size_t);
+	fout.write(reinterpret_cast<char*>(&main_size), sizeof (size_t));
 	for (;;)
 	{
 		fin.read(input_chunk, BUFFER);
@@ -112,7 +112,7 @@ void decompress(string filename_in, string filename_out, string filename_hf)
 
 	std::ofstream fout(filename_out.c_str(), std::ios_base::binary);
 	size_t main_size = 0;
-	fin.read(reinterpret_cast<char*>(&main_size), sizeof size_t);
+	fin.read(reinterpret_cast<char*>(&main_size), sizeof (size_t));
 	for (;;)
 	{
 		fin.read(input_chunk, BUFFER);
@@ -359,12 +359,14 @@ void check(const string& input_decode)
 
 TEST(encode_decode, file_input)
 {
-	generate(256);
+	for (int time = 0; time < 25; ++time) {
+		generate(256);
 
-	compress(filename_input, filename_output, filename_hf);
-	string input_decode = "new.in";
-	decompress(filename_output, input_decode, filename_hf);
-	check(input_decode);
+		compress(filename_input, filename_output, filename_hf);
+		string input_decode = "new.in";
+		decompress(filename_output, input_decode, filename_hf);
+		check(input_decode);
+	}
 }
 
 TEST(encode_decode, file_big_input)

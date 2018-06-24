@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
 	const string input = argv[1 + decode];
 
 	string output;
-	if (argc == 3 + decode)
+	if (argc == 3 + decode) // find name output
 	{
 		output = argv[2 + decode];
 	}
@@ -165,8 +165,13 @@ int main(int argc, char* argv[])
 		output = "output.out";
 	}
 	const string out_hf = "output.hf";
-	compress(input, output, out_hf);
-	string input_decode = "original.in";
-	decompress(output, input_decode, out_hf);
+	if(decode)
+	{
+		decompress(input, output, out_hf);
+	}
+	else
+	{
+		compress(input, output, out_hf);
+	}
 	return 0;
 }

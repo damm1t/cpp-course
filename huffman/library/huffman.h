@@ -22,7 +22,7 @@ using std::stack;
 
 namespace huffman
 {
-	const size_t BUFFER = 5;
+	const size_t BUFFER = 1000;
 
 	typedef unsigned char byte;
 	void write_int_to_byte_array(byte* x, const int value, int& end);
