@@ -85,6 +85,7 @@ namespace algo
 		std::pair<iterator, bool> create_node(node* root, T x, char type);
 		void find_del(shared_ptr<node> root, T const& x);
 		void del(shared_ptr<node>& root);
+		T& del_left(shared_ptr<node>& root);
 		iterator find(node* cur, T value);
 		iterator next(const node* cur, const node* last, T const& x) const;
 		iterator prev(const node* cur, const node* last, T const& x) const;
@@ -108,7 +109,7 @@ namespace algo
 	template <typename T>
 	struct persistent_set<T>::iterator
 	{
-		using iterator_category = std::random_access_iterator_tag;
+		using iterator_category = std::bidirectional_iterator_tag;
 		using value_type = const T;
 		using difference_type = std::ptrdiff_t;
 
@@ -194,7 +195,17 @@ namespace algo
 		{
 			del(root);
 		}
-		else if (root->value > x)
+		else if (root->value < x)
+		{
+			if (root->right.use_count() > 1)
+			{
+				auto new_right_node = std::make_shared<node>(*(root->right));
+				root->right = new_right_node;
+			}
+			auto res = del_left(root->right);
+			root->value = res;
+		}
+		else
 		{
 			if (root->left.use_count() > 1)
 			{
@@ -202,15 +213,6 @@ namespace algo
 				root->left = new_left_node;
 			}
 			return find_del(root->left, x);
-		}
-		else
-		{
-			if (root->right.use_count() > 1)
-			{
-				auto new_right_node = std::make_shared<node>(*(root->right));
-				root->right = new_right_node;
-			}
-			return find_del(root->right, x);
 		}
 	}
 
@@ -245,6 +247,21 @@ namespace algo
 		{
 			root = std::shared_ptr<node>();
 		}
+	}
+
+	template <typename T>
+	T& persistent_set<T>::del_left(shared_ptr<node>& root)
+	{
+		if(root->left)
+		{
+			auto value = del_left(root->left);
+			return value;
+		}
+		if (root->right)
+			return del_left(root->right);
+		T value(root->value);
+		root = std::shared_ptr<node>();
+		return value;
 	}
 
 	template <typename T>
@@ -439,6 +456,9 @@ namespace algo
 	template <typename T>
 	persistent_set<T>& persistent_set<T>::operator=(persistent_set const& rhs)
 	{
+		if (&rhs == this)
+			return *this;
+
 		version++;		
 		if (rhs.root)
 		{
@@ -492,9 +512,12 @@ namespace algo
 					auto new_right_node = std::make_shared<node>(*(root->right));
 					root->right = new_right_node;
 				}
+				auto res = del_left(root->right);
+				root->value = res;
+				/*
 				root->value = root->right->value;
 				root->right->value = tmp;
-				del(root->right);
+				del(root->right);*/
 			}
 			else if (root->left)
 			{
