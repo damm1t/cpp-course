@@ -51,7 +51,15 @@ namespace algo
 		iterator begin() const;
 		// Возващает итератор на элемент следующий за элементом с максимальным ключом.
 		iterator end() const;
-
+		bool empty() const
+		{
+			return begin() == end();
+		}
+		void clear()
+		{
+			invalidate_iterators();
+			root.~unique_ptr();
+		}
 		void swap(persistent_set<T>& other) noexcept
 		{
 			swap(root, other.root);
