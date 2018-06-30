@@ -16,7 +16,7 @@ namespace algo
 	struct persistent_set
 	{
 		struct iterator;
-
+		using const_iterator = iterator;
 		persistent_set() = default;
 
 		persistent_set(persistent_set const& other);
@@ -51,12 +51,18 @@ namespace algo
 		iterator begin() const;
 		// Возващает итератор на элемент следующий за элементом с максимальным ключом.
 		iterator end() const;
+
+		iterator rbegin() const;
+
+		iterator rend() const;
 		bool empty() const
 		{
 			return begin() == end();
 		}
 		void clear()
 		{
+			if (empty())
+				return;
 			invalidate_iterators();
 			root.~unique_ptr();
 		}
@@ -504,6 +510,18 @@ namespace algo
 	typename persistent_set<T>::iterator persistent_set<T>::end() const
 	{
 		return iterator(nullptr, nullptr, version, true);
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator persistent_set<T>::rbegin() const
+	{
+		return end();
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator persistent_set<T>::rend() const
+	{
+		return begin();
 	}
 }
 #endif //SET_H
