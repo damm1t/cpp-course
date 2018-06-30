@@ -52,9 +52,9 @@ namespace algo
 		// Возващает итератор на элемент следующий за элементом с максимальным ключом.
 		iterator end() const;
 
-		iterator rbegin() const;
+		std::reverse_iterator<iterator> rbegin() const;
 
-		iterator rend() const;
+		std::reverse_iterator<iterator> rend() const;
 		bool empty() const
 		{
 			return begin() == end();
@@ -513,15 +513,15 @@ namespace algo
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::rbegin() const
+	std::reverse_iterator<typename persistent_set<T>::iterator> persistent_set<T>::rbegin() const
 	{
-		return end();
+		return std::reverse_iterator<iterator>(end());
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::rend() const
+	std::reverse_iterator<typename persistent_set<T>::iterator> persistent_set<T>::rend() const
 	{
-		return begin();
+		return std::reverse_iterator<iterator>(begin());
 	}
 }
 #endif //SET_H
