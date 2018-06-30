@@ -88,8 +88,8 @@ namespace algo
 
 	private:
 		std::pair<iterator, bool> create_node(node* root, T x, char type);
-		void find_del(shared_ptr<node> root, T x);
-		void del(shared_ptr<node> root);
+		void find_del(shared_ptr<node> root, T const& x);
+		void del(shared_ptr<node>& root);
 		iterator find(node* cur, T value);
 		iterator next(const node* cur, const node* last, T const& x) const;
 		iterator prev(const node* cur, const node* last, T const& x) const;
@@ -125,10 +125,10 @@ namespace algo
 		T const* operator->() const;
 		iterator& operator++();
 		iterator operator++(int);
-
+		iterator& operator+=(int x);
 		iterator& operator--();
 		iterator operator--(int);
-
+		iterator& operator-=(int x);
 		bool operator==(iterator const& other) const noexcept
 		{
 			if(is_end != other.is_end)
@@ -193,7 +193,7 @@ namespace algo
 	}
 
 	template <typename T>
-	void persistent_set<T>::find_del(shared_ptr<node> root, T x)
+	void persistent_set<T>::find_del(shared_ptr<node> root, T const& x)
 	{
 		if(root->value == x)
 		{
@@ -220,7 +220,7 @@ namespace algo
 	}
 
 	template <typename T>
-	void persistent_set<T>::del(shared_ptr<node> root)
+	void persistent_set<T>::del(shared_ptr<node>& root)
 	{
 
 		T tmp(root->value);
@@ -248,7 +248,7 @@ namespace algo
 		}
 		else
 		{
-			root.~shared_ptr();
+			root = std::shared_ptr<node>();
 		}
 	}
 
@@ -360,7 +360,7 @@ namespace algo
 	{
 		if(is_end)
 		{
-			throw std::runtime_error("Not found next element");
+			return *this;
 		}
 		*this = set->next(set->root.get(), nullptr, ptr->value);
 		return *this;
@@ -375,8 +375,20 @@ namespace algo
 	}
 
 	template <typename T>
+	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator+=(const int x)
+	{
+		for(int i = 0; i < x; ++i)
+		{
+			++(*this);
+		}
+		return *this;
+	}
+
+	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator--()
 	{
+		if (is_end)
+			return *this;
 		*this = set->prev(set->root.get(), nullptr, ptr->value);
 		return *this;
 	}
@@ -387,6 +399,16 @@ namespace algo
 		iterator tmp(*this);
 		--(*this);
 		return tmp;
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator-=(int x)
+	{
+		for(int i = 0; i < x; ++i)
+		{
+			--(*this);
+		}
+		return *this;
 	}
 
 
@@ -412,6 +434,7 @@ namespace algo
 			root->left = rhs.root->left;
 			root->right = rhs.root->right;
 		}
+		return *this;
 	}
 
 	template <typename T>
@@ -474,7 +497,7 @@ namespace algo
 			}
 			else
 			{
-				root.~unique_ptr();
+				root.reset();
 			}
 			return;
 		}
