@@ -87,7 +87,7 @@ namespace algo
 
 	private:
 		std::pair<iterator, bool> create_node(node* root, T x, char type);
-		void find_del(shared_ptr<node> root, T const& x);
+		void find_del(shared_ptr<node>& root, T const& x);
 		void del(shared_ptr<node>& root);
 		T del_left(shared_ptr<node>& root);
 		iterator find(node* cur, T value);
@@ -203,7 +203,7 @@ namespace algo
 	}
 
 	template <typename T>
-	void persistent_set<T>::find_del(shared_ptr<node> root, T const& value)
+	void persistent_set<T>::find_del(shared_ptr<node>& root, T const& value)
 	{
 		if (root->value == value)
 		{
@@ -239,7 +239,7 @@ namespace algo
 			}
 			else
 			{
-				root.reset();
+				root = std::shared_ptr<node>();
 			}
 			return;
 		}
