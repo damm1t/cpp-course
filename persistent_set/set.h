@@ -32,16 +32,18 @@ namespace algo
 		void erase(iterator it);
 
 		iterator begin() const;
-		
+
 		iterator end() const;
 
 		std::reverse_iterator<iterator> rbegin() const;
 
 		std::reverse_iterator<iterator> rend() const;
+
 		bool empty() const
 		{
 			return begin() == end();
 		}
+
 		void clear()
 		{
 			if (empty())
@@ -49,6 +51,7 @@ namespace algo
 			invalidate_iterators();
 			root.~unique_ptr();
 		}
+
 		void swap(persistent_set<T>& other) noexcept
 		{
 			root.swap(other.root);
@@ -57,6 +60,7 @@ namespace algo
 			other.version = tmp;
 			//swap(version, other.version);
 		}
+
 	private:
 		struct node
 		{
@@ -96,11 +100,12 @@ namespace algo
 		{
 			version++;
 		}
+
 		unique_ptr<node> root;
 		uint64_t version = 0;
 	};
 
-	template<typename T>
+	template <typename T>
 	void swap(persistent_set<T>& lhs, persistent_set<T>& rhs) noexcept
 	{
 		lhs.swap(rhs);
@@ -125,13 +130,14 @@ namespace algo
 		iterator& operator--();
 		iterator operator--(int);
 		iterator& operator-=(int x);
+
 		bool operator==(iterator const& other) const noexcept
 		{
-			if(is_end != other.is_end)
+			if (is_end != other.is_end)
 			{
 				return false;
 			}
-			if(is_end)
+			if (is_end)
 			{
 				return version == other.version;
 			}
@@ -144,8 +150,16 @@ namespace algo
 		}
 
 		iterator() = default;
-		iterator(const persistent_set<T>* set, const node* ptr, const uint64_t version, const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end){}
-		iterator(iterator const& other) : set(other.set), ptr(other.ptr), version(other.version), is_end(other.is_end){}
+
+		iterator(const persistent_set<T>* set, const node* ptr, const uint64_t version,
+		         const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end)
+		{
+		}
+
+		iterator(iterator const& other) : set(other.set), ptr(other.ptr), version(other.version), is_end(other.is_end)
+		{
+		}
+
 	private:
 		const persistent_set<T>* set;
 		const node* ptr;
@@ -189,9 +203,48 @@ namespace algo
 	}
 
 	template <typename T>
-	void persistent_set<T>::find_del(shared_ptr<node> root, T const& x)
+	void persistent_set<T>::find_del(shared_ptr<node> root, T const& value)
 	{
-		if(root->value == x)
+		if (root->value == value)
+		{
+			T tmp(root->value);
+
+			if (root->right)
+			{
+				if (root->right.use_count() > 1)
+				{
+					auto new_right_node = std::make_shared<node>(*(root->right));
+					root->right = new_right_node;
+				}
+				if (root->right->left)
+				{
+					root->value = del_left(root->right);
+				}
+				else
+				{
+					root->value = root->right->value;
+					root->right = root->right->right;
+				}
+			}
+			else if (root->left)
+			{
+				if (root->left.use_count() > 1)
+				{
+					auto new_left_node = std::make_shared<node>(*(root->left));
+					root->left = new_left_node;
+				}
+				root->value = root->left->value;
+				root->right = root->left->right;
+				root->left = root->left->left;
+			}
+			else
+			{
+				root.reset();
+			}
+			return;
+		}
+		return find_del((root->value > value) ? root->left : root->right, value);
+		/*if(root->value == x)
 		{
 			del(root);
 		}
@@ -213,13 +266,12 @@ namespace algo
 				root->left = new_left_node;
 			}
 			return find_del(root->left, x);
-		}
+		}*/
 	}
 
 	template <typename T>
 	void persistent_set<T>::del(shared_ptr<node>& root)
 	{
-
 		T tmp(root->value);
 		if (root->left)
 		{
@@ -252,7 +304,7 @@ namespace algo
 	template <typename T>
 	T persistent_set<T>::del_left(shared_ptr<node>& root)
 	{
-		if(root->left)
+		if (root->left)
 		{
 			return del_left(root->left);
 		}
@@ -373,7 +425,7 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator++()
 	{
-		if(is_end)
+		if (is_end)
 		{
 			return *this;
 		}
@@ -392,7 +444,7 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator+=(const int x)
 	{
-		for(int i = 0; i < x; ++i)
+		for (int i = 0; i < x; ++i)
 		{
 			++(*this);
 		}
@@ -432,7 +484,7 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator-=(int x)
 	{
-		for(int i = 0; i < x; ++i)
+		for (int i = 0; i < x; ++i)
 		{
 			--(*this);
 		}
@@ -458,7 +510,7 @@ namespace algo
 		if (&rhs == this)
 			return *this;
 
-		version++;		
+		version++;
 		if (rhs.root)
 		{
 			root = std::make_unique<node>(rhs.root->value);
@@ -496,26 +548,31 @@ namespace algo
 	{
 		invalidate_iterators();
 		T value(it.ptr->value);
-		if(find(value) == end())
+		if (find(value) == end())
 		{
 			return;
 		}
-		if(root->value == value)
+		if (root->value == value)
 		{
 			T tmp(root->value);
-			
-			if(root->right)
+
+			if (root->right)
 			{
 				if (root->right.use_count() > 1)
 				{
 					auto new_right_node = std::make_shared<node>(*(root->right));
 					root->right = new_right_node;
 				}
-				root->value = del_left(root->right);
-				/*
-				root->value = root->right->value;
-				root->right->value = tmp;
-				del(root->right);*/
+				if (root->right->left)
+				{
+					root->value = del_left(root->right);
+				}
+				else
+				{
+					root->value = root->right->value;
+					//root->right->value = tmp;
+					root->right = root->right->right;
+				}
 			}
 			else if (root->left)
 			{
@@ -525,8 +582,8 @@ namespace algo
 					root->left = new_left_node;
 				}
 				root->value = root->left->value;
-				root->left->value = tmp;
-				del(root->left);
+				root->right = root->left->right;
+				root->left = root->left->left;
 			}
 			else
 			{
@@ -542,7 +599,7 @@ namespace algo
 	{
 		auto min = go_left(root.get());
 
-		if(min == nullptr)
+		if (min == nullptr)
 		{
 			return end();
 		}
