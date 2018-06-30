@@ -71,12 +71,7 @@ namespace algo
 			{
 			}
 
-			~node()
-			{
-				value.~T();
-				left.~shared_ptr();
-				right.~shared_ptr();
-			}
+			~node() = default;
 
 			node(shared_ptr<node> l, shared_ptr<node> r, T val) : value(val), left(l), right(r)
 			{
@@ -326,6 +321,8 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::node* persistent_set<T>::go_left(node* cur) const noexcept
 	{
+		if (cur == nullptr)
+			return cur;
 		while (cur->left)
 		{
 			cur = cur->left.get();
@@ -336,6 +333,8 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::node* persistent_set<T>::go_right(node* cur) const noexcept
 	{
+		if (cur == nullptr)
+			return cur;
 		while (cur->right)
 		{
 			cur = cur->right.get();
