@@ -85,8 +85,8 @@ namespace algo
 		void find_del(shared_ptr<node> root, T x);
 		void del(shared_ptr<node> root);
 		iterator find(node* cur, T value);
-		iterator next(node* cur, node* last, T const& x) noexcept;
-		iterator prev(node* cur, node* last, T const& x) noexcept;
+		iterator next(const node* cur, const node* last, T const& x) const;
+		iterator prev(const node* cur, const node* last, T const& x) const;
 		node* go_left(node* cur) const noexcept;
 		node* go_right(node* cur) const noexcept;
 
@@ -139,11 +139,11 @@ namespace algo
 			return !(*this == other);
 		}
 
-		iterator(persistent_set<T>* set, node* ptr, const uint64_t version, const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end){}
+		iterator(const persistent_set<T>* set, const node* ptr, const uint64_t version, const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end){}
 		iterator(iterator const& other) : set(other.set), ptr(other.ptr), version(other.version), is_end(other.is_end){}
 	private:
-		persistent_set<T>* set;
-		node* ptr;
+		const persistent_set<T>* set;
+		const node* ptr;
 		uint64_t version;
 		bool is_end;
 	};
@@ -261,7 +261,7 @@ namespace algo
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::next(node* cur, node* last, T const& x) noexcept
+	typename persistent_set<T>::iterator persistent_set<T>::next(const node* cur, const node* last, T const& x) const
 	{
 		///			ñur					value	?	x
 		///		left	right
@@ -288,7 +288,7 @@ namespace algo
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::prev(node* cur, node* last, T const& x) noexcept
+	typename persistent_set<T>::iterator persistent_set<T>::prev(const node* cur, const node* last, T const& x) const
 	{
 		///			ñur					value	?	x
 		///		left	right
@@ -345,7 +345,7 @@ namespace algo
 	{
 		if(is_end)
 		{
-			throw std::runtime_error("No next element");
+			throw std::runtime_error("Not found next element");
 		}
 		*this = set->next(set->root.get(), nullptr, ptr->value);
 		return *this;
@@ -477,9 +477,8 @@ namespace algo
 		}
 		else
 		{
-			return end();
-			// ToDo	
-			//return iterator(this, min, version);
+			//return end();
+			return iterator(this, min, version);
 		}
 	}
 
