@@ -28,7 +28,7 @@ namespace algo
 		// Деструктор. Вызывается при удалении объектов persistent_set.
 		// Инвалидирует все итераторы ссылающиеся на элементы этого persistent_set
 		// (включая итераторы ссылающиеся на элемент следующий за последним).
-		~persistent_set();
+		~persistent_set() = default;
 
 		// Поиск элемента.
 		// Возвращает итератор на найденный элемент, либо end(), если элемент
@@ -82,6 +82,14 @@ namespace algo
 
 	private:
 		std::pair<iterator, bool> create_node(node* root, T x, char type);
+		void find_del(shared_ptr<node> root, T x);
+		void del(shared_ptr<node> root);
+		iterator find(node* cur, T value);
+		iterator next(node* cur, node* last, T const& x) noexcept;
+		iterator prev(node* cur, node* last, T const& x) noexcept;
+		node* go_left(node* cur) const noexcept;
+		node* go_right(node* cur) const noexcept;
+
 		void invalidate_iterators()
 		{
 			version++;
@@ -95,6 +103,7 @@ namespace algo
 	template <typename T>
 	struct persistent_set<T>::iterator
 	{
+		friend persistent_set<T>;
 		// Элемент на который сейчас ссылается итератор.
 		// Разыменование итератора end() неопределено.
 		// Разыменование невалидного итератора неопределено.
@@ -114,6 +123,14 @@ namespace algo
 
 		bool operator==(iterator const& other) const noexcept
 		{
+			if(is_end != other.is_end)
+			{
+				return false;
+			}
+			if(is_end)
+			{
+				return version == other.version;
+			}
 			return (ptr == other.ptr && set == other.set && version == other.version);
 		}
 
@@ -122,12 +139,13 @@ namespace algo
 			return !(*this == other);
 		}
 
-		iterator(persistent_set<T>* set, node* ptr, uint64_t version) : set(set), ptr(ptr), version(version){}
-		
+		iterator(persistent_set<T>* set, node* ptr, const uint64_t version, const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end){}
+		iterator(iterator const& other) : set(other.set), ptr(other.ptr), version(other.version), is_end(other.is_end){}
 	private:
 		persistent_set<T>* set;
 		node* ptr;
 		uint64_t version;
+		bool is_end;
 	};
 
 	template <typename T>
@@ -166,6 +184,157 @@ namespace algo
 	}
 
 	template <typename T>
+	void persistent_set<T>::find_del(shared_ptr<node> root, T x)
+	{
+		if(root->value == x)
+		{
+			del(root);
+		}
+		else if (root->value > x)
+		{
+			if (root->left.use_count() > 1)
+			{
+				auto new_left_node = std::make_shared<node>(*(root->left));
+				root->left = new_left_node;
+			}
+			return find_del(root->left, x);
+		}
+		else
+		{
+			if (root->right.use_count() > 1)
+			{
+				auto new_right_node = std::make_shared<node>(*(root->right));
+				root->right = new_right_node;
+			}
+			return find_del(root->right, x);
+		}
+	}
+
+	template <typename T>
+	void persistent_set<T>::del(shared_ptr<node> root)
+	{
+
+		T tmp(root->value);
+		if (root->left)
+		{
+			if (root->left.use_count() > 1)
+			{
+				auto new_left_node = std::make_shared<node>(*(root->left));
+				root->left = new_left_node;
+			}
+			root->value = root->left->value;
+			root->left->value = tmp;
+			del(root->left);
+		}
+		else if (root->right)
+		{
+			if (root->right.use_count() > 1)
+			{
+				auto new_right_node = std::make_shared<node>(*(root->right));
+				root->right = new_right_node;
+			}
+			root->value = root->right->value;
+			root->right->value = tmp;
+			del(root->right);
+		}
+		else
+		{
+			root.~shared_ptr();
+		}
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator persistent_set<T>::find(node* cur, T value)
+	{
+		if (cur == nullptr)
+		{
+			return end();
+		}
+		else if (cur->value == value)
+		{
+			return iterator(this, cur, version);
+		}
+		else
+		{
+			return find((cur->value > value) ? cur->left.get() : cur->right.get(), value);
+		}
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator persistent_set<T>::next(node* cur, node* last, T const& x) noexcept
+	{
+		///			сur					value	?	x
+		///		left	right
+		if (x < cur->value)
+		{
+			return next(cur->left.get(), cur, x);
+		}
+		else if (x > cur->value)
+		{
+			return next(cur->right.get(), last, x);
+		}
+		// expect x == cur->value
+		if (cur->right)
+		{
+			cur = go_left(cur->right.get());
+			return iterator(this, cur, version);
+		}
+		// right list
+		if (last) // was cur = cur->left
+		{
+			return iterator(this, last, version);
+		}
+		return end();
+	}
+
+	template <typename T>
+	typename persistent_set<T>::iterator persistent_set<T>::prev(node* cur, node* last, T const& x) noexcept
+	{
+		///			сur					value	?	x
+		///		left	right
+		if (x < cur->value)
+		{
+			return prev(cur->left.get(), last, x);
+		}
+		else if (x > cur->value)
+		{
+			return prev(cur->right.get(), cur, x);
+		}
+		// expect x == cur->value
+		if (cur->left)
+		{
+			cur = go_right(cur->left.get());
+			return iterator(this, cur, version);
+		}
+		// left list
+		if (last) // was cur = cur->right
+		{
+			return iterator(this, last, version);
+		}
+		return end();
+	}
+
+	template <typename T>
+	typename persistent_set<T>::node* persistent_set<T>::go_left(node* cur) const noexcept
+	{
+		while (cur->left)
+		{
+			cur = cur->left.get();
+		}
+		return cur;
+	}
+
+	template <typename T>
+	typename persistent_set<T>::node* persistent_set<T>::go_right(node* cur) const noexcept
+	{
+		while (cur->right)
+		{
+			cur = cur->right.get();
+		}
+		return cur;
+	}
+
+	template <typename T>
 	T const& persistent_set<T>::iterator::operator*() const
 	{
 		return ptr->value;
@@ -174,26 +343,37 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator++()
 	{
-		return iterator(nullptr, nullptr, 0);
+		if(is_end)
+		{
+			throw std::runtime_error("No next element");
+		}
+		*this = set->next(set->root.get(), nullptr, ptr->value);
+		return *this;
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::iterator::operator++(int)
+	typename persistent_set<T>::iterator persistent_set<T>::iterator::operator++(int postfix)
 	{
-		return iterator(nullptr, nullptr, 0);
+		iterator tmp(*this);
+		++(*this);
+		return tmp;
 	}
 
 	template <typename T>
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator--()
 	{
-		return iterator(nullptr, nullptr, 0);
+		*this = set->prev(set->root.get(), nullptr, ptr->value);
+		return *this;
 	}
 
 	template <typename T>
-	typename persistent_set<T>::iterator persistent_set<T>::iterator::operator--(int)
+	typename persistent_set<T>::iterator persistent_set<T>::iterator::operator--(int postfix)
 	{
-		return iterator(nullptr, nullptr, 0);
+		iterator tmp(*this);
+		--(*this);
+		return tmp;
 	}
+
 
 	template <typename T>
 	persistent_set<T>::persistent_set(persistent_set const& other)
@@ -220,14 +400,9 @@ namespace algo
 	}
 
 	template <typename T>
-	persistent_set<T>::~persistent_set()
-	{
-	}
-
-	template <typename T>
 	typename persistent_set<T>::iterator persistent_set<T>::find(T value)
 	{
-		return iterator(nullptr, nullptr, 0);
+		return find(root.get(), value);
 	}
 
 	template <typename T>
@@ -240,9 +415,9 @@ namespace algo
 			auto it = iterator(this, root.get(), version);
 			return std::pair<iterator, bool>(it, true);
 		}
-		/*iterator it = find(value); TODO
+		iterator it = find(value);
 		if (it != end())
-			return std::make_pair(it, false);*/
+			return std::make_pair(it, false);
 		invalidate_iterators();
 		return create_node(root.get(), value, (root->value > value) ? 'l' : 'r');
 	}
@@ -250,18 +425,68 @@ namespace algo
 	template <typename T>
 	void persistent_set<T>::erase(iterator it)
 	{
+		invalidate_iterators();
+		T value(it.ptr->value);
+		if(find(value) == end())
+		{
+			return;
+		}
+		if(root->value == value)
+		{
+			T tmp(root->value);
+			
+			if(root->right)
+			{
+				if (root->right.use_count() > 1)
+				{
+					auto new_right_node = std::make_shared<node>(*(root->right));
+					root->right = new_right_node;
+				}
+				root->value = root->right->value;
+				root->right->value = tmp;
+				del(root->right);
+			}
+			else if (root->left)
+			{
+				if (root->left.use_count() > 1)
+				{
+					auto new_left_node = std::make_shared<node>(*(root->left));
+					root->left = new_left_node;
+				}
+				root->value = root->left->value;
+				root->left->value = tmp;
+				del(root->left);
+			}
+			else
+			{
+				root.~unique_ptr();
+			}
+			return;
+		}
+		find_del((root->value > value) ? root->left : root->right, value);
 	}
 
 	template <typename T>
 	typename persistent_set<T>::iterator persistent_set<T>::begin() const
 	{
-		return iterator(nullptr, nullptr, 0);
+		auto min = go_left(root.get());
+
+		if(min == nullptr)
+		{
+			return end();
+		}
+		else
+		{
+			return end();
+			// ToDo	
+			//return iterator(this, min, version);
+		}
 	}
 
 	template <typename T>
 	typename persistent_set<T>::iterator persistent_set<T>::end() const
 	{
-		return iterator(nullptr, nullptr, 0);
+		return iterator(nullptr, nullptr, version, true);
 	}
 }
 #endif //SET_H
