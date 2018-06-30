@@ -21,35 +21,18 @@ namespace algo
 
 		persistent_set(persistent_set const& other);
 
-		// Изменяет this так, чтобы он содержал те же элементы, что и rhs.
-		// Инвалидирует все итераторы, принадлежащие persistent_set'у this, включая end().
 		persistent_set& operator=(persistent_set const& rhs);
 
-		// Деструктор. Вызывается при удалении объектов persistent_set.
-		// Инвалидирует все итераторы ссылающиеся на элементы этого persistent_set
-		// (включая итераторы ссылающиеся на элемент следующий за последним).
 		~persistent_set() = default;
 
-		// Поиск элемента.
-		// Возвращает итератор на найденный элемент, либо end(), если элемент
-		// с указанным значением отсутвует.
 		iterator find(T value);
 
-		// Вставка элемента.
-		// 1. Если такой ключ уже присутствует, вставка не производиться, возвращается итератор
-		//    на уже присутствующий элемент и false.
-		// 2. Если такого ключа ещё нет, производиться вставка, возвращается итератор на созданный
-		//    элемент и true.
-		// Если вставка произведена, инвалидирует все итераторы, принадлежащие persistent_set'у this, включая end().
 		std::pair<iterator, bool> insert(T value);
 
-		// Удаление элемента.
-		// Инвалидирует все итераторы, принадлежащие persistent_set'у this, включая end().
 		void erase(iterator it);
 
-		// Возващает итератор на элемент с минимальный ключом.
 		iterator begin() const;
-		// Возващает итератор на элемент следующий за элементом с максимальным ключом.
+		
 		iterator end() const;
 
 		std::reverse_iterator<iterator> rbegin() const;
@@ -68,8 +51,11 @@ namespace algo
 		}
 		void swap(persistent_set<T>& other) noexcept
 		{
-			swap(root, other.root);
-			swap(version, other.version);
+			root.swap(other.root);
+			const auto tmp = version;
+			version = other.version;
+			other.version = tmp;
+			//swap(version, other.version);
 		}
 	private:
 		struct node
@@ -127,21 +113,19 @@ namespace algo
 	template <typename T>
 	struct persistent_set<T>::iterator
 	{
-		friend persistent_set<T>;
-		// Элемент на который сейчас ссылается итератор.
-		// Разыменование итератора end() неопределено.
-		// Разыменование невалидного итератора неопределено.
-		T const& operator*() const;
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = const T;
+		using difference_type = std::ptrdiff_t;
 
-		// Переход к элементу со следующим по величине ключом.
-		// Инкремент итератора end() неопределен.
-		// Инкремент невалидного итератора неопределен.
+		using pointer = const T*;
+		using reference = const T&;
+
+		friend persistent_set<T>;
+		T const& operator*() const;
+		T const* operator->() const;
 		iterator& operator++();
 		iterator operator++(int);
 
-		// Переход к элементу с предыдущим по величине ключом.
-		// Декремент итератора begin() неопределен.
-		// Декремент невалидного итератора неопределен.
 		iterator& operator--();
 		iterator operator--(int);
 
@@ -163,6 +147,7 @@ namespace algo
 			return !(*this == other);
 		}
 
+		iterator() = default;
 		iterator(const persistent_set<T>* set, const node* ptr, const uint64_t version, const bool is_end = false) : set(set), ptr(ptr), version(version), is_end(is_end){}
 		iterator(iterator const& other) : set(other.set), ptr(other.ptr), version(other.version), is_end(other.is_end){}
 	private:
@@ -362,6 +347,12 @@ namespace algo
 	T const& persistent_set<T>::iterator::operator*() const
 	{
 		return ptr->value;
+	}
+
+	template <typename T>
+	T const* persistent_set<T>::iterator::operator->() const
+	{
+		return &(ptr->value);
 	}
 
 	template <typename T>
