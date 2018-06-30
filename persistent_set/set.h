@@ -88,8 +88,8 @@ namespace algo
 		iterator find(node* cur, T value);
 		iterator next(const node* cur, const node* last, T const& x) const;
 		iterator prev(const node* cur, const node* last, T const& x) const;
-		node* go_left(node* cur) const noexcept;
-		node* go_right(node* cur) const noexcept;
+		const static node* go_left(const node* cur) noexcept;
+		const static node* go_right(const node* cur) noexcept;
 
 		void invalidate_iterators()
 		{
@@ -319,7 +319,7 @@ namespace algo
 	}
 
 	template <typename T>
-	typename persistent_set<T>::node* persistent_set<T>::go_left(node* cur) const noexcept
+	const typename persistent_set<T>::node* persistent_set<T>::go_left(const node* cur) noexcept
 	{
 		if (cur == nullptr)
 			return cur;
@@ -331,7 +331,7 @@ namespace algo
 	}
 
 	template <typename T>
-	typename persistent_set<T>::node* persistent_set<T>::go_right(node* cur) const noexcept
+	const typename persistent_set<T>::node* persistent_set<T>::go_right(const node* cur) noexcept
 	{
 		if (cur == nullptr)
 			return cur;
@@ -387,7 +387,20 @@ namespace algo
 	typename persistent_set<T>::iterator& persistent_set<T>::iterator::operator--()
 	{
 		if (is_end)
+		{
+			auto it = go_right(set->root.get());
+
+			if (it == nullptr)
+			{
+				*this = set->end();
+			}
+			else
+			{
+				//return end();
+				*this = iterator(set, it, version);
+			}
 			return *this;
+		}
 		*this = set->prev(set->root.get(), nullptr, ptr->value);
 		return *this;
 	}
@@ -522,7 +535,7 @@ namespace algo
 	template <typename T>
 	typename persistent_set<T>::iterator persistent_set<T>::end() const
 	{
-		return iterator(nullptr, nullptr, version, true);
+		return iterator(this, nullptr, version, true);
 	}
 
 	template <typename T>
