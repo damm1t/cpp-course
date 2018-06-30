@@ -104,7 +104,11 @@ namespace algo
 		uint64_t version = 0;
 	};
 
-	
+	template<typename T>
+	void swap(persistent_set<T>& lhs, persistent_set<T>& rhs) noexcept
+	{
+		lhs.swap(rhs);
+	}
 
 	template <typename T>
 	struct persistent_set<T>::iterator
