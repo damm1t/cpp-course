@@ -85,7 +85,7 @@ namespace algo
 		std::pair<iterator, bool> create_node(node* root, T x, char type);
 		void find_del(shared_ptr<node> root, T const& x);
 		void del(shared_ptr<node>& root);
-		T& del_left(shared_ptr<node>& root);
+		T del_left(shared_ptr<node>& root);
 		iterator find(node* cur, T value);
 		iterator next(const node* cur, const node* last, T const& x) const;
 		iterator prev(const node* cur, const node* last, T const& x) const;
@@ -250,12 +250,11 @@ namespace algo
 	}
 
 	template <typename T>
-	T& persistent_set<T>::del_left(shared_ptr<node>& root)
+	T persistent_set<T>::del_left(shared_ptr<node>& root)
 	{
 		if(root->left)
 		{
-			auto value = del_left(root->left);
-			return value;
+			return del_left(root->left);
 		}
 		if (root->right)
 			return del_left(root->right);
@@ -512,8 +511,7 @@ namespace algo
 					auto new_right_node = std::make_shared<node>(*(root->right));
 					root->right = new_right_node;
 				}
-				auto res = del_left(root->right);
-				root->value = res;
+				root->value = del_left(root->right);
 				/*
 				root->value = root->right->value;
 				root->right->value = tmp;
