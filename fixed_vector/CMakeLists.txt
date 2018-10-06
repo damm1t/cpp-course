@@ -3,4 +3,4 @@ project(fixed_vector)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(fixed_vector main.cpp fixed_vector.h fixed_vector_testing.cpp )
+add_executable(fixed_vector vector_tests.cpp)
