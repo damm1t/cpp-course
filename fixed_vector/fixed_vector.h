@@ -136,7 +136,7 @@ public:
         return index;
     }
 
-    const_iterator erase(const_iterator index) {
+    iterator erase(const_iterator index) {
         assert(begin() <= index && index < end());
         (data_ + (index - begin()))->~T();
         --size_;
@@ -144,7 +144,7 @@ public:
             new(data_ + i)T(*(data_ + i + 1));
             (data_ + i + 1)->~T();
         }
-        return index;
+        return data_ + (index - data_);
     }
 
     const_iterator erase(const_iterator begin, const_iterator end) {
